@@ -101,4 +101,18 @@ class CI_Controller {
 		return self::$instance;
 	}
 
+	
+	protected function view($data)
+	{
+		$this->load->view('layout_v2', $data);
+	}
+
+
+	protected function _auth()
+	{
+		if (!$this->session->has_userdata('token')) {
+			return redirect('auth/index');
+		}
+	}
+
 }
