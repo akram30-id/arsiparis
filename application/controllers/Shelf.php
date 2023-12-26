@@ -18,7 +18,7 @@ class Shelf extends CI_Controller
     {
         $shelfs = $this->db->select('a.*, b.category_name')
             ->from('tb_shelfs AS a')
-            ->join('tb_shelf_categories AS b', 'a.category_id=b.shelf_category_id')
+            ->join('tb_shelf_categories AS b', 'a.category_id=b.shelf_category_id', 'left')
             ->order_by('created_at', 'DESC')
             ->get()->result();
 
@@ -84,6 +84,10 @@ class Shelf extends CI_Controller
             }
         }
 
+        // echo '<pre>';
+        // print_r($post);
+        // die();
+
         $this->form_validation->set_rules('kode-rak', 'Kode Rak', 'is_unique[tb_shelfs.shelf_code]');
 
         if ($this->form_validation->run() === false) {
@@ -95,6 +99,7 @@ class Shelf extends CI_Controller
             $this->db->insert('tb_shelfs', [
                 'shelf_code' => $post['kode-rak'],
                 'room_code' => $post['kode-room'],
+                'category_id' => $post['kategori'],
                 'shelf_name' => $post['nama-rak'],
                 'description' => $post['deskripsi-rak'],
                 'status' => $post['status-rak'],

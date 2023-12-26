@@ -41,6 +41,19 @@
                                 </div>
                             </div>
                             <div class="col-md-12 mb-4">
+                                <label for="kategori" class="form-label">KATEGORI</label>
+                                <?php $kategori = ['1|RAK DOKUMEN', '2|RAK BOX'] ?>
+                                <select class="form-select" name="kategori" id="kategori" required>
+                                    <?php foreach ($kategori as $s) { ?>
+                                    <option value="<?= explode('|', $s)[0] ?>"><?= explode('|', $s)[1] ?></option>
+                                    <?php 
+                                } ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Status gedung wajib dipilih.
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-4">
                                 <label for="kode-vendor" class="form-label">KODE RUANGAN</label>
                                 <select class="form-select" name="kode-room" id="kode-room" required>
                                 <?php foreach ($rooms as $s) { ?>

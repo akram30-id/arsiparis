@@ -107,14 +107,6 @@
                             </div>
 
                             <div class="col-md-12 mb-4">
-                                <label for="pencipta" class="form-label">Pencipta Arsip</label>
-                                <input type="text" class="form-control" id="pencipta" name="pencipta" required>
-                                <div class="invalid-feedback">
-                                    Pencipta Arsip Wajib Diisi
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mb-4">
                                 <label for="deskripsi" class="form-label">Deskripsi</label>
                                 <textarea name="deskripsi" id="deskripsi" rows="3" class="form-control" required></textarea>
                                 <div class="invalid-feedback">
@@ -150,21 +142,6 @@
             }
             // console.info(selected)
         })
-
-
-        $('#pencipta').on('change', function () {
-            $.ajax({
-                url: "'" + <?= base_url('archive/show_profiles?name=') ?> + $(this).val() + "'",
-                type: 'GET',
-                dataType: 'JSON',
-                success: function(response) {
-                    console.info(response)
-                }
-            })
-        })
-
-
-
         
     })
 </script>

@@ -46,10 +46,10 @@
                             foreach ($archives as $archive) { ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= $archive->archive_code ?></td>
+                                <td><?= $archive->archive_code ?> <?= ($archive->box_code == null && $archive->shelf_code == null) ? '<span>(DIGITALIZED)</span>' : '' ?></td>
                                 <td><?= $archive->archive_title ?></td>
-                                <td><?= in_array($archive->box_code, ["", null]) ? "NOT STORED IN THE BOX" : $archive->box_code ?></td>
-                                <td><?= $archive->shelf_name ?></td>
+                                <td><?= in_array($archive->box_code, ["", null]) ? "NOT STORED IN ANY BOX" : $archive->box_code ?></td>
+                                <td><?= in_array($archive->shelf_code, ["", null]) ? "NOT STORED IN ANY SHELF" : $archive->shelf_name ?></td>
                                 <td><?= $archive->unit_code == null ? 'ALL UNITS' : $archive->unit_name ?></td>
                                 <td><?= $archive->archive_status ?></td>
                                 <td class="text-primary"><?= $archive->archive_status == 'PERMANEN' ? '#PERMANENT' : $archive->retention_type ?></td>
