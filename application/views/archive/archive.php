@@ -34,7 +34,6 @@
                                 <th>Tipe Retensi</th>
                                 <th>Tanggal Retensi</th>
                                 <th>Deskripsi</th>
-                                <th>Pencipta Arsip</th>
                                 <th>Tanggal Dibuat</th>
                                 <th>Terakhir Update</th>
                                 <th>###</th>
@@ -55,7 +54,6 @@
                                 <td class="text-primary"><?= $archive->archive_status == 'PERMANEN' ? '#PERMANENT' : $archive->retention_type ?></td>
                                 <td class="text-danger"><?= $archive->archive_status == 'PERMANEN' ? '#PERMANENT' : date('d F Y', strtotime($archive->retention_date)) ?></td>
                                 <td><?= $archive->description ?></td>
-                                <td><?= $archive->name ?></td>
                                 <td><?= date('d F Y', strtotime($archive->created_at)) . ' by ' . $archive->added_by ?></td>
                                 <td><?= $archive->updated_at == null ? '<i>belum pernah update</i>' : date('d F Y', strtotime($archive->updated_at)) . ' by ' . $archive->updated_by ?></td>
                                 <td>
@@ -69,13 +67,13 @@
                                     </div>
                                     <div class="col-md-10 mb-1">
                                         <!-- assign document to archive -->
-                                        <a href="<?= base_url("archive/archive_assign/$archive->archive_id#content") ?>" class="btn btn-success btn-sm rounded-pill">
+                                        <a href="<?= base_url("archive/archive_assign/$archive->archive_code#content") ?>" class="btn btn-success btn-sm rounded-pill">
                                             Assign
                                         </a>
                                     </div>
                                     <div class="col-md-10 mb-1">
                                         <!-- show detail archive -->
-                                        <a href="<?= base_url("archive/archive_detail/$archive->archive_id#content") ?>" class="btn btn-secondary btn-sm rounded-pill">
+                                        <a href="<?= base_url("archive/archive_detail/$archive->archive_code#content") ?>" class="btn btn-secondary btn-sm rounded-pill">
                                             Detail
                                         </a>
                                     </div>

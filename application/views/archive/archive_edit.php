@@ -25,18 +25,21 @@
             <div class="card px-4" id="content">
                 <div class="card-body">
                     <h2 class="text-center mt-4 mb-5"><?= strtoupper($title) ?></h2>
-                    <form action="<?= base_url('archive/archive_add') ?>" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+                    <form action="<?= base_url('archive/archive_update/' . $archive->archive_id) ?>" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
 
                         <div class="row justify-content-center mt-3">
                             <div class="col-md-12 mb-4">
                                 <label for="kode-arsip" class="form-label">Kode Arsip</label>
-                                <input type="text" class="form-control" id="kode-arsip" name="kode-arsip">
-                                <small style="font-size: 9pt;"><i>Bila dikosongkan, kode akan di-generate oleh sistem</i></small>
+                                <input type="text" class="form-control" value="<?= $archive->archive_code ?>" id="kode-arsip" name="kode-arsip-on" disabled required>
+                                <input type="hidden" class="form-control" value="<?= $archive->archive_code ?>" id="kode-arsip-on" name="kode-arsip-on">
+                                <div class="invalid-feedback">
+                                    Kode Arsip Wajib Diisi
+                                </div>
                             </div>
 
                             <div class="col-md-12 mb-4">
                                 <label for="judul-arsip" class="form-label">Judul Arsip</label>
-                                <input type="text" class="form-control" id="judul-arsip" name="judul-arsip" required>
+                                <input type="text" class="form-control" value="<?= $archive->archive_title ?>" id="judul-arsip" name="judul-arsip" required>
                                 <div class="invalid-feedback">
                                     Judul Arsip Wajib Diisi
                                 </div>
@@ -47,7 +50,7 @@
                                 <select class="form-select" name="unit" id="unit">
                                     <option value="">SELURUH UNIT / DOKUMEN PERUSAHAAN</option>
                                 <?php foreach ($units as $s) { ?>
-                                    <option value="<?= $s->unit_code ?>"><?= $s->unit_code . ' - ' . $s->unit_name ?></option>
+                                    <option <?php if($s->unit_code == $archive->unit_code) echo 'selected="selected"' ?> value="<?= $s->unit_code ?>"><?= $s->unit_code . ' - ' . $s->unit_name ?></option>
                                     <?php 
                                 } ?>
                                 </select>
@@ -59,7 +62,7 @@
                                 <?php
                                 $mediaPenyimpanan = ['RAK', 'BOX', 'DIGITAL']; 
                                 foreach ($mediaPenyimpanan as $s) { ?>
-                                    <option value="<?= $s ?>"><?= $s ?></option>
+                                    <option <?php if($archive->storage == $s) echo 'selected="selected"' ?> value="<?= $s ?>"><?= $s ?></option>
                                     <?php 
                                 } ?>
                                 </select>
@@ -70,11 +73,11 @@
                             
                             <div class="col-md-12 mb-4">
                                 <label for="status" class="form-label">Status Retensi Arsip</label>
-                                <select class="form-select" name="status" id="status" required>
+                                <select class="form-select" name="status" id="status" <?php if(in_array($archive->archive_status, ['PERMANEN', null])) echo 'disabled' ?> required>
                                 <?php
-                                $status = ['RETENSI', 'PERMANEN']; 
+                                $status = ['RETENTION', 'PERMANEN']; 
                                 foreach ($status as $s) { ?>
-                                    <option value="<?= $s ?>"><?= $s ?></option>
+                                    <option <?php if($s == $archive->archive_status || $archive->archive_status == null) echo 'selected="selected"' ?> value="<?= $s ?>"><?= $s ?></option>
                                     <?php 
                                 } ?>
                                 </select>
@@ -85,11 +88,12 @@
 
                             <div class="col-md-12 mb-4">
                                 <label for="jadwal-retensi" class="form-label">Jadwal Retensi</label>
-                                <select class="form-select" name="jadwal-retensi" id="jadwal-retensi" required>
+                                <select class="form-select" name="jadwal-retensi" id="jadwal-retensi" required <?php if(in_array($archive->archive_status, ['PERMANEN', null])) echo 'disabled' ?>>
+                                <option value="">- PILIH JADWAL RETENSI -</option>
                                 <?php
-                                $schedule = ['ANNUALY', 'MONTHLY', 'DAILY']; 
+                                $schedule = ['TAHUNAN', 'BULANAN', 'HARIAN']; 
                                 foreach ($schedule as $s) { ?>
-                                    <option value="<?= $s ?>"><?= $s ?></option>
+                                    <option <?php if($s == $archive->retention_type) echo 'selected="selected"' ?> value="<?= $s ?>"><?= $s ?></option>
                                     <?php 
                                 } ?>
                                 </select>
@@ -100,7 +104,7 @@
 
                             <div class="col-md-12 mb-4">
                                 <label for="tanggal-retensi" class="form-label">Tanggal Retensi</label>
-                                <input type="date" class="form-control" id="tanggal-retensi" name="tanggal-retensi" required>
+                                <input type="date" class="form-control" id="tanggal-retensi" name="tanggal-retensi" required <?php if(in_array($archive->archive_status, ['PERMANEN', null])) echo 'disabled' ?> value="<?= $archive->retention_date ?>">
                                 <div class="invalid-feedback">
                                     Tanggal Retensi Wajib Diisi
                                 </div>
@@ -108,7 +112,7 @@
 
                             <div class="col-md-12 mb-4">
                                 <label for="deskripsi" class="form-label">Deskripsi</label>
-                                <textarea name="deskripsi" id="deskripsi" rows="3" class="form-control" required></textarea>
+                                <textarea name="deskripsi" id="deskripsi" rows="3" class="form-control" required><?= $archive->description ?></textarea>
                                 <div class="invalid-feedback">
                                     Deskripsi Dokumen Wajib Diisi
                                 </div>
@@ -118,7 +122,7 @@
 
                         <div class="d-flex justify-content-end mt-2 mb-3">
                             <input type="reset" value="Batal" class="btn btn-secondary btn-sm" style="margin-right: 8px;">
-                            <input type="submit" value="Submit" class="btn btn-primary btn-sm">
+                            <input type="submit" value="Update" class="btn btn-warning btn-sm">
                         </div>
                     </form>
                 </div>

@@ -57,6 +57,18 @@
         td {
             vertical-align: middle;
         }
+
+        input[type=checkbox] {
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(1); /* IE */
+        -moz-transform: scale(1); /* FF */
+        -webkit-transform: scale(1); /* Safari and Chrome */
+        -o-transform: scale(1); /* Opera */
+        transform: scale(1);
+        padding: 10px;
+        border: 1px solid #000;
+        }
+
     </style>
 
     <!-- =======================================================
