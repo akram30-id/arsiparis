@@ -673,7 +673,7 @@ class Archive extends CI_Controller
 
             $this->db->update('tb_documents', ['flag_assign' => 1], ['document_no' => $document_assigned]);
 
-            if ($this->db->trans_status() === FALSE) {
+            if ($this->db->trans_status() === false) {
                 $this->db->trans_rollback();
 
                 $this->session->set_flashdata('fail', 'GAGAL ASSIGN DOKUMEN.');
@@ -688,9 +688,53 @@ class Archive extends CI_Controller
     }
 
 
-    public function archive_detail()
+    public function archive_detail($code)
     {
-        
+        $archive_docs = $this->db->select('*, a.created_at AS assigned_at, a.added_by AS assigned_by, a.updated_at AS assign_updated_at, a.updated_by AS assign_updated_by')
+            ->from('tb_archive_documents AS a')
+            ->join('tb_archives AS b', 'a.archive_code=b.archive_code')
+            ->join('tb_documents AS c', 'a.document_no=c.document_no')
+            ->join('tb_categories AS d', 'c.category_code=d.category_code')
+            ->join('tb_units AS e', 'c.unit_code=e.unit_code', 'left')
+            ->where('a.archive_code', $code)
+            ->order_by('a.created_at', 'DESC')
+            ->get()->result();
+
+        // echo '<pre>';
+        // print_r($archive_docs);
+        // die();
+
+        $data = [
+            'view' => 'archive/archive_detail',
+            'title' => 'Detail Dokumen Arsip - ' . $archive_docs[0]->archive_title,
+            'archives' => $archive_docs
+        ];
+
+        $this->view($data);
+    }
+
+
+    public function archive_document_takeout($document_no, $archive_code)
+    {
+        $this->db->trans_begin();
+        $delete = $this->db->delete('tb_archive_documents', ['document_no' => $document_no]);
+
+        if ($delete != false) {
+            $this->db->set('flag_assign', '0');
+            $this->db->where('document_no', $document_no);
+            $this->db->update('tb_documents');
+        }
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('fail', 'GAGAL TAKEOUT DOKUMEN ARSIP');
+            return redirect('archive/archive_detail/' . $archive_code . '#content');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'BERHASIL TAKEOUT DOKUMEN ARSIP');
+            return redirect('archive/archive_detail/' . $archive_code . '#content');
+        }
+
     }
 
 }
