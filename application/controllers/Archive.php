@@ -263,6 +263,7 @@ class Archive extends CI_Controller
             ->join('tb_shelfs AS b', 'a.shelf_code=b.shelf_code', 'left')
             ->join('tb_units AS c', 'a.unit_code=c.unit_code', 'left')
             ->join('tb_profiles AS d', 'a.archived_by=d.nik', 'left')
+            ->where_not_in('a.archive_status', ['DISPOSE'])
             ->order_by('a.created_at', 'DESC')
             ->get()->result();
 
@@ -426,7 +427,8 @@ class Archive extends CI_Controller
 
         $this->db->trans_start();
         $this->db->update('tb_archives', [
-            'shelf_code' => $post['kode-rak']
+            'shelf_code' => $post['kode-rak'],
+            'box_code' => NULL,
         ], ['archive_id' => $post['id-arsip']]);
 
         if ($this->db->trans_status() === false) {
@@ -706,8 +708,9 @@ class Archive extends CI_Controller
 
         $data = [
             'view' => 'archive/archive_detail',
-            'title' => 'Detail Dokumen Arsip - ' . $archive_docs[0]->archive_title,
-            'archives' => $archive_docs
+            'title' => 'Detail Dokumen Arsip - ' . $code,
+            'archives' => $archive_docs,
+            'archive_code' => $code
         ];
 
         $this->view($data);
@@ -725,7 +728,7 @@ class Archive extends CI_Controller
             $this->db->update('tb_documents');
         }
 
-        if ($this->db->trans_status() === FALSE) {
+        if ($this->db->trans_status() === false) {
             $this->db->trans_rollback();
             $this->session->set_flashdata('fail', 'GAGAL TAKEOUT DOKUMEN ARSIP');
             return redirect('archive/archive_detail/' . $archive_code . '#content');
@@ -735,6 +738,123 @@ class Archive extends CI_Controller
             return redirect('archive/archive_detail/' . $archive_code . '#content');
         }
 
+    }
+
+
+    public function archive_dispose($code)
+    {
+        $this->db->trans_begin();
+        $this->db->insert('tb_disposal_archives', [
+            'archive_code' => $code,
+            'dispose_date' => date('Y-m-d H:i:s'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'added_by' => $this->session->user->username
+        ]);
+
+        $this->db->update('tb_archives', ['archive_status' => 'DISPOSE'], ['archive_code' => $code]);
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('fail', 'GAGAL DISPOSE ARSIP');
+            return redirect('archive/archive#content');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'BERHASIL DISPOSE ARSIP');
+            return redirect('archive/archive#content');
+        }
+    }
+
+
+    public function archive_show_disposed()
+    {
+        $disposed = $this->db->select('*, a.added_by AS disposed_by, a.updated_at AS dispose_update_at, a.updated_by AS dispose_update_by')
+            ->from('tb_disposal_archives AS a')
+            ->join('tb_archives AS b', 'a.archive_code=b.archive_code')
+            ->join('tb_units AS d', 'b.unit_code=d.unit_code', 'left')
+            ->join('tb_profiles AS e', 'b.archived_by=e.nik', 'left')
+            ->order_by('b.created_at', 'DESC')
+            ->get()->result();
+
+        $data = [
+            'view' => 'archive/archive_disposed',
+            'title' => 'Kelola Data Arsip Disposed',
+            'archives' => $disposed
+        ];
+
+        $this->view($data);
+    }
+
+
+    public function archive_restore($code)
+    {
+        $current_data = $this->db->get_where('tb_archives', ['archive_code' => $code])->row();
+
+        $this->db->trans_begin();
+
+        $this->db->update('tb_archives', [
+            'archive_status' => 'ADJUSTMENT',
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_by' => $this->session->user->username
+        ], ['archive_code' => $code]);
+
+        $this->db->delete('tb_disposal_archives', ['archive_code' => $code]);
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('fail', 'GAGAL RESTORE ARSIP');
+            return redirect('archive/archive_show_disposed/' . $code . '#content');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'BERHASIL RESTORE ARSIP');
+            return redirect('archive/archive#content');
+        }
+    }
+
+
+    public function archive_delete($code)
+    {
+        $this->db->trans_begin();
+        $this->db->delete('tb_disposal_archives', ['archive_code' => $code]);
+        $this->db->delete('tb_archive_documents', ['archive_code' => $code]);
+        $this->db->delete('tb_archives', ['archive_code' => $code]);
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('fail', 'GAGAL MENGHAPUS ARSIP');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'BERHASIL MENGHAPUS ARSIP');
+        }
+        return redirect('archive/archive_show_disposed/' . $code . '#content');
+    }
+
+
+    public function archive_sync()
+    {
+        $archives = $this->db->select('archive_code')
+            ->from('tb_archives')
+            ->where_in('archive_status', ['RETENSI', 'RETENTION'])
+            ->where('retention_date <= NOW()', NULL, FALSE)
+            ->get()->result();
+
+        if ($archives) {
+            foreach ($archives as $archive) {
+                $this->db->trans_begin();
+                $this->db->update('tb_archives', ['archive_status' => 'ADJUSTMENT'], ['archive_code' => $archive->archive_code]);
+
+                if ($this->db->trans_status() === false) {
+                    $this->db->trans_rollback();
+                    $this->session->set_flashdata('fail', 'GAGAL SINKRONISASI ARSIP: KODE @' . $archive->archive_code);
+                    return redirect('archive/archive#content');
+                } else {
+                    $this->db->trans_commit();
+                    continue;
+                }
+            }
+        }
+
+        $this->session->set_flashdata('success', 'SINKRONISASI SELESAI');
+        return redirect('archive/archive#content');
     }
 
 }

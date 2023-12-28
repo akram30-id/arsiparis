@@ -20,7 +20,7 @@
             <div class="card fw-semibold" id="content" style="font-size: 8pt; color: #000;">
                 <div class="card-body">
                     <h2 class="mt-3 mb-3 text-center border-0"><?= $title ?></h2>
-                    <a href="<?= base_url('archive/archive_assign/' . $archives[0]->archive_code . '#content') ?>" class="btn btn-success btn-sm mb-3 rounded-pill">Assign Dokumen</a>
+                    <a href="<?= base_url('archive/archive_assign/' . $archive_code . '#content') ?>" class="btn btn-success btn-sm mb-3 rounded-pill">Assign Dokumen</a>
                     <table class="table table-hover table-bordered datatable">
                         <thead>
                             <tr>
@@ -72,7 +72,7 @@
                                                 <div class="card card-body" style="width: 300px;">
                                                 Yakin Ingin Take Out <?= $document->title ?>?
                                                 <div class="d-flex justify-content-end">
-                                                    <a style="color: red; margin-right: 8px;" href="<?= base_url('archive/archive_document_takeout/' . $document->document_no . '/' . $document->archive_code) ?>">Ya</a>
+                                                    <a style="color: red; margin-right: 8px;" href="<?= base_url('archive/archive_document_takeout/' . $document->document_no . '/' . $archive_code) ?>">Ya</a>
                                                     <a style="color: red;" data-bs-toggle="collapse" data-bs-target="#deletedocument<?= $document->document_id ?>" href="#">Tidak</a>
                                                 </div>
                                                 </div>
