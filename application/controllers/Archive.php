@@ -14,6 +14,7 @@ class Archive extends CI_Controller
 
         $this->load->library('form_validation');
         $this->load->library('upload');
+        $this->load->library('pdfgenerator');
     }
 
 
@@ -342,6 +343,8 @@ class Archive extends CI_Controller
             } else if ($post['penyimpanan'] == 'BOX') {
                 return redirect('archive/assign_box/' . $last_id . '#content');
             } else {
+                $this->archive_label($post['kode-arsip'], 'DIGITALIZED'); // SET QR CODE
+
                 $this->session->set_flashdata('success', 'BERHASIL MENAMBAHKAN ARSIP.');
                 return redirect('archive/archive#content');
             }
@@ -421,15 +424,26 @@ class Archive extends CI_Controller
     {
         $post = $this->input->post();
 
+        $current_data = $this->db->select('shelf_code')
+            ->from('tb_archives')
+            ->where('archive_id', $post['id-arsip'])
+            ->get()->row();
+
         // echo '<pre>';
         // print_r($post);
         // die();
 
+        $data_update = [
+            'shelf_code' => isset($post['kode-rak']) ? $post['kode-rak'] : $current_data->shelf_code,
+            'box_code' => null,
+        ];
+
+        // echo '<pre>';
+        // print_r($data_update);
+        // die();
+
         $this->db->trans_start();
-        $this->db->update('tb_archives', [
-            'shelf_code' => $post['kode-rak'],
-            'box_code' => NULL,
-        ], ['archive_id' => $post['id-arsip']]);
+        $this->db->update('tb_archives', $data_update, ['archive_id' => $post['id-arsip']]);
 
         if ($this->db->trans_status() === false) {
             $this->db->trans_rollback();
@@ -437,6 +451,21 @@ class Archive extends CI_Controller
             return redirect('archive/assign_rak/' . $post['id-arsip'] . '#content');
         } else {
             $this->db->trans_commit();
+            
+            // get shelf name
+            $shelf_name = $this->db->select('shelf_name')
+                ->from('tb_shelfs')
+                ->where('shelf_code', $data_update['shelf_code'])
+                ->get()->row();
+
+            // get shelf name
+            $archive_code = $this->db->select('archive_code')
+            ->from('tb_archives')
+            ->where('archive_id', $post['id-arsip'])
+            ->get()->row();
+
+            $this->archive_label($archive_code->archive_code, $shelf_name->shelf_name); // generate QR CODE
+
             $this->session->set_flashdata('success', "Success Assign Rak");
             return redirect('archive/archive/#content');
         }
@@ -447,9 +476,17 @@ class Archive extends CI_Controller
     {
         $post = $this->input->post();
 
+        $current_data = $this->db->select('shelf_code, box_code')
+            ->from('tb_archives')
+            ->where('archive_id', $post['id-arsip'])
+            ->get()->row();
+
         // echo '<pre>';
         // print_r($post);
         // die();
+        
+        $post['kode-box'] = isset($post['kode-box']) ? $post['kode-box'] : $current_data->box_code; 
+        $post['kode-rak'] = isset($post['kode-rak']) ? $post['kode-rak'] : $current_data->shelf_code; 
 
         $this->db->trans_start();
         $this->db->update('tb_archives', [
@@ -463,6 +500,21 @@ class Archive extends CI_Controller
             return redirect('archive/assign_rak/' . $post['id-arsip'] . '#content');
         } else {
             $this->db->trans_commit();
+
+            // get shelf name
+            $box_name = $this->db->select('box_name')
+                ->from('tb_boxes')
+                ->where('box_code', $post['box_code'])
+                ->get()->row();
+
+            // get shelf name
+            $archive_code = $this->db->select('archive_code')
+            ->from('tb_archives')
+            ->where('archive_id', $post['id-arsip'])
+            ->get()->row();
+
+            $this->archive_label($archive_code->archive_code, $box_name->box_name); // generate QR CODE
+
             $this->session->set_flashdata('success', "Success Assign Box");
             return redirect('archive/archive/#content');
         }
@@ -834,7 +886,7 @@ class Archive extends CI_Controller
         $archives = $this->db->select('archive_code')
             ->from('tb_archives')
             ->where_in('archive_status', ['RETENSI', 'RETENTION'])
-            ->where('retention_date <= NOW()', NULL, FALSE)
+            ->where('retention_date <= NOW()', null, false)
             ->get()->result();
 
         if ($archives) {
@@ -855,6 +907,104 @@ class Archive extends CI_Controller
 
         $this->session->set_flashdata('success', 'SINKRONISASI SELESAI');
         return redirect('archive/archive#content');
+    }
+
+    public function archive_report()
+    {
+        // title dari pdf
+        $this->data['title_pdf'] = 'Laporan Penjualan Toko Kita';
+        
+        // filename dari pdf ketika didownload
+        $file_pdf = 'laporan_penjualan_toko_kita';
+        // setting paper
+        $paper = 'A4';
+        //orientasi paper potrait / landscape
+        $orientation = "landscape";
+
+        $archives = $this->db->select('a.*, b.shelf_name, c.unit_name, d.name')
+            ->from('tb_archives AS a')
+            ->join('tb_shelfs AS b', 'a.shelf_code=b.shelf_code', 'left')
+            ->join('tb_units AS c', 'a.unit_code=c.unit_code', 'left')
+            ->join('tb_profiles AS d', 'a.archived_by=d.nik', 'left')
+            ->where_not_in('a.archive_status', ['DISPOSE'])
+            ->where('YEAR(a.created_at)', date('Y'))
+            ->order_by('a.created_at', 'DESC')
+            ->get()->result();
+
+        // echo '<pre>';
+        // print_r($archives);
+        // die();
+
+        $data = [
+            'title' => 'Report Annual Archive PT Bank DBS Indonesia',
+            'subtitle' => 'Dataset Periode of ' . date('Y'),
+            'archives' => $archives
+        ];
+
+        $html = $this->load->view('archive/archive_report', $data, true);	    
+        
+        // run dompdf
+        $this->pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
+    }
+
+
+    public function archive_label($code, $storage)
+    {
+         // GENERATE QR CODE
+         $this->load->library('ciqrcode'); //pemanggilan library QR CODE
+
+         $config['imagedir']             = './assets/qrcode/'; //direktori penyimpanan qr code
+         $config['quality']              = true; //boolean, the default is true
+         $config['size']                 = '512'; //interger, the default is 1024
+         $config['black']                = array(224,255,255); // array, default is array(255,255,255)
+         $config['white']                = array(70,130,180); // array, default is array(0,0,0)
+         $this->ciqrcode->initialize($config);
+
+         $image_name = $code . '.png'; //buat name dari qr code sesuai dengan archive code
+
+         $params['data'] = 'kode:' . $code . '[' . $storage . ']'; //data yang akan di jadikan QR CODE
+         $params['level'] = 'H'; //H=High
+         $params['size'] = 10;
+         $params['savename'] = FCPATH . $config['imagedir'] . $image_name; //simpan image QR CODE ke folder assets/images/
+         $this->ciqrcode->generate($params); // fungsi untuk generate QR CODE
+    }
+
+
+    public function archive_label_show($archive_code)
+    {
+        // title dari pdf
+        $this->data['title_pdf'] = 'Label Arsip ' . $archive_code;
+        
+        // filename dari pdf ketika didownload
+        $file_pdf = $archive_code . '_dbs_archive_label';
+        // setting paper
+        $paper = 'A6';
+        //orientasi paper potrait / landscape
+        $orientation = "landscape";
+
+        $this->db->select('a.archive_code, a.archive_title, a.storage, a.box_code, a.shelf_code, b.shelf_name, d.nik, d.name, a.created_at AS created_archive, a.archived_by');
+        $this->db->from('tb_archives AS a');
+        $this->db->join('tb_shelfs AS b', 'a.shelf_code=b.shelf_code', 'left');
+        $this->db->join('tb_boxes AS c', 'a.box_code=c.box_code', 'left');
+        $this->db->join('tb_profiles AS d', 'a.archived_by=d.nik', 'left');
+        $this->db->where('a.archive_code', $archive_code);
+        $this->db->limit(1);
+        $archives = $this->db->get()->row();
+
+        // echo '<pre>';
+        // print_r($archives);
+        // die();
+
+        $data = [
+            'title' => 'DBS ARCHIVE LABEL (' . $archive_code . ')',
+            'subtitle' => $archives->archive_title,
+            'archives' => $archives
+        ];
+
+        $html = $this->load->view('archive/archive_label', $data, true);	    
+        
+        // run dompdf
+        $this->pdfgenerator->generate($html, $file_pdf, $paper, $orientation);
     }
 
 }

@@ -1,7 +1,7 @@
 <section class="section" style="margin-bottom: 164px;">
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-10">
+    <div class="row justify-content-center mt-5" id="card-content">
+        <div class="col-md-10" id="data">
             <?php if ($this->session->flashdata('success')) { ?>
             <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
                 <?= $this->session->flashdata('success'); ?>
@@ -21,8 +21,9 @@
                 <div class="card-body">
                     <h2 class="mt-3 mb-3 text-center border-0"><?= $title ?> <a href="<?= base_url('archive/archive_sync#content') ?>" class="mb-3 text-warning rounded-pill"><i class="bi bi-arrow-repeat"></i></a></h2>
                     <a href="<?= base_url('archive/archive_new#content') ?>" class="btn btn-primary btn-sm mb-3 rounded-pill">Tambah archive</a>
-                    <a href="<?= base_url('archive/archive_show_disposed#content') ?>" class="btn btn-secondary btn-sm mb-3 rounded-pill">Data Disposal</a>
-                    <table class="table table-hover table-bordered datatable">
+                    <a href="<?= base_url('archive/archive_show_disposed#content') ?>" class="btn btn-danger btn-sm mb-3 rounded-pill">Data Disposal</a>
+                    <a href="<?= base_url('archive/archive_report#content') ?>" target="_blank" class="btn btn-success btn-sm mb-3 rounded-pill">Cetak Laporan Arsip</a>
+                    <table class="table table-hover table-responsive table-bordered datatable">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -46,7 +47,12 @@
                             foreach ($archives as $archive) { ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= $archive->archive_code ?> <?= ($archive->box_code == null && $archive->shelf_code == null) ? '<span>(DIGITALIZED)</span>' : '' ?></td>
+                                <td>
+                                <a class="text-danger fw-bold show-qr" target="_blank" href="<?= base_url('archive/archive_label_show/' . $archive->archive_code) ?>">
+                                    <?= $archive->archive_code ?>
+                                </a>
+                                    <?= ($archive->box_code == null && $archive->shelf_code == null) ? '<span>(DIGITALIZED)</span>' : '' ?>
+                                </td>
                                 <td><?= $archive->archive_title ?></td>
                                 <td><?= in_array($archive->box_code, ["", null]) ? "NOT STORED IN ANY BOX" : $archive->box_code ?></td>
                                 <td><?= in_array($archive->shelf_code, ["", null]) ? "NOT STORED IN ANY SHELF" : $archive->shelf_name ?></td>
