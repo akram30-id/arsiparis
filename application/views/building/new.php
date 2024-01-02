@@ -37,10 +37,10 @@
                             </div>
                             <div class="col-md-12 mb-4">
                                 <label for="kode-vendor" class="form-label">KODE GEDUNG</label>
-                                <input type="text" class="form-control" id="kode-gedung" name="kode-gedung" required>
-                                <div class="invalid-feedback">
-                                    Kode Gedung Wajib Diisi
-                                </div>
+                                <input type="text" class="form-control" id="kode-gedung" name="kode-gedung">
+                                <small style="font-size: 9pt;">
+                                    <i>Jika Dikosongkan akan di-generate otomatis oleh sistem</i>
+                                </small>
                             </div>
                             <div class="col-md-12 mb-4">
                                 <label for="status-gedung" class="form-label">STATUS</label>

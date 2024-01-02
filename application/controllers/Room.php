@@ -49,6 +49,8 @@ class Room extends CI_Controller
 
     public function delete($id)
     {
+        if($this->_restrict_role_nonadmin() == false) return false;
+        
         $delete = $this->db->delete('tb_rooms', ['room_id' => $id]);
 
         if ($delete) {
@@ -63,6 +65,8 @@ class Room extends CI_Controller
 
     public function new()
     {
+        $this->_restrict_role_nonadmin();
+
         $rooms = $this->db->get('tb_rooms')->result();
         $buildings = $this->db->get('tb_buildings')->result();
 
@@ -79,6 +83,8 @@ class Room extends CI_Controller
 
     public function add()
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
 
         if (isset($post['kode-ruangan'])) {
@@ -116,6 +122,8 @@ class Room extends CI_Controller
 
     public function edit($id)
     {
+        $this->_restrict_role_nonadmin();
+        
         $room = $this->db->get_where('tb_rooms', ['room_id' => $id])->row();
         $buildings = $this->db->get('tb_buildings')->result();
 
@@ -132,6 +140,8 @@ class Room extends CI_Controller
 
     public function update($room_code)
     {
+        $this->_restrict_role_nonadmin();
+        
         $post = $this->input->post();
 
         try {
@@ -155,7 +165,11 @@ class Room extends CI_Controller
 
     public function room_detail($code)
     {
-        $shelfs = $this->db->get_where('tb_shelfs', ['shelf_code' => $code])->result();
+        $shelfs = $this->db->select('*')
+            ->from('tb_shelfs AS a')
+            ->join('tb_rooms AS b', 'a.room_code=b.room_code')
+            ->where('a.room_code', $code)
+            ->get()->result();
 
         $data = [
             'view' => 'room/detail',#content

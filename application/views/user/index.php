@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <?php if ($this->session->flashdata('success')) { ?>
             <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
                 <?= $this->session->flashdata('success'); ?>
@@ -56,7 +56,8 @@
             <div class="card" id="content" style="font-size: 10pt;">
                 <div class="card-body">
                     <h2 class="mt-3 mb-3 text-center border-0"><?= $title ?></h2>
-                    <a href="<?= base_url('user/new#content') ?>" class="btn btn-primary btn-sm mb-3 rounded-pill">Tambah User</a>
+                    <a href="<?= base_url('user/new#content') ?>" class="btn btn-primary btn-sm mb-3 rounded-pill">Tambah User</a> <br>
+                    <small>Default Password: <b>dBSJkt#2023</b></small> <br>
                     <table class="table table-hover table-bordered datatable">
                         <thead>
                             <tr>
@@ -66,6 +67,7 @@
                                 <th>NIK</th>
                                 <th>No. Telepon</th>
                                 <th>Role</th>
+                                <th>Unit Kerja</th>
                                 <th>Dibuat Pada</th>
                                 <th>Terakhir Diupdate</th>
                                 <th>###</th>
@@ -81,7 +83,8 @@
                                 <td><?= $user->name ?></td>
                                 <td><?= $user->nik ?></td>
                                 <td><?= $user->phone ?></td>
-                                <td><?= $user->role ?></td>
+                                <td><?= $user->role == 1 ? 'ADMINISTRATOR' : (($user->role == 2) ? 'LEADER/MANAGER' : 'STAFF') ?></td>
+                                <td><?= $user->unit_name ?></td>
                                 <td><?= date('d F Y', strtotime($user->created_at)) . ' by ' . $user->added_by ?></td>
                                 <td><?= $user->updated_at == null ? '<i>belum pernah update</i>' : date('d F Y', strtotime($user->updated_at)) . ' by ' . $user->updated_by ?></td>
                                 <td>

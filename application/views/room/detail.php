@@ -1,7 +1,7 @@
 <section class="section" style="margin-bottom: 164px;">
 
     <div class="row justify-content-center mt-5">
-        <div class="col-md-10">
+        <div class="col-md-9">
             <?php if ($this->session->flashdata('success')) { ?>
             <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
                 <?= $this->session->flashdata('success'); ?>
@@ -19,8 +19,7 @@
         } ?>
             <div class="card" id="content" style="font-size: 10pt;">
                 <div class="card-body">
-                    <h2 class="mt-3 mb-3 text-center border-0">Data Rak Existing</h2>
-                    <a href="<?= base_url('shelf/new#content') ?>" class="btn btn-primary btn-sm mb-3 rounded-pill">Tambah Rak</a>
+                    <h2 class="mt-3 mb-3 text-center border-0">Data Rak Dalam Ruangan <?= isset($shelfs[0]) ? $shelfs[0]->room_name : '' ?></h2>
                     <table class="table table-hover table-bordered datatable">
                         <thead>
                             <tr>
@@ -28,7 +27,6 @@
                                 <th>Kode Ruangan</th>
                                 <th>Kode Rak</th>
                                 <th>Nama Rak</th>
-                                <th>Kategori Rak</th>
                                 <th>Deskripsi</th>
                                 <th>Status</th>
                                 <th>Dibuat Pada</th>
@@ -45,7 +43,6 @@
                                 <td><?= $shelf->room_code ?></td>
                                 <td><?= $shelf->shelf_code ?></td>
                                 <td><?= $shelf->shelf_name ?></td>
-                                <td><?= $shelf->category_name ?></td>
                                 <td><?= $shelf->description ?></td>
                                 <td><?= $shelf->status ?></td>
                                 <td><?= date('d F Y', strtotime($shelf->created_at)) . ' by ' . $shelf->added_by ?></td>

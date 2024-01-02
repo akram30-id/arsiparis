@@ -16,11 +16,21 @@ class User extends CI_Controller
 
     private function _get_all_users()
     {
-        $users = $this->db->select('a.*, b.username')
-            ->from('tb_profiles AS a')
-            ->join('tb_users AS b', 'a.user_id=b.user_id')
-            ->order_by('a.created_at', 'DESC')
-            ->get()->result();
+        $this->db->select('*');
+        $this->db->from('tb_users AS a');
+        $this->db->join('tb_profiles AS b', 'a.user_id=b.user_id', 'left');
+        $this->db->join('tb_units AS c', 'b.unit_code=c.unit_code');
+        if ($this->session->user->role == 2) { // kalo role nya leader
+            $this->db->where_in('b.role', [2,3]); // ambil user selain admin
+        } else if ($this->session->user->role == 3) { // kalo rolenya staff
+            $this->db->where('b.role', 3); // ambil user staff aja
+        }
+
+        $users = $this->db->get()->result();
+
+        // echo '<pre>';
+        // print_r($this->db->last_query());
+        // die();
 
         return $users;
     }
@@ -43,11 +53,17 @@ class User extends CI_Controller
             'users' => $users
         ];
 
+        // echo '<pre>';
+        // print_r($users);
+        // die();
+
         $this->view($data);
     }
 
     public function delete($id)
     {
+        if($this->_restrict_role_nonadmin() == false) return false;
+
         $delete = $this->db->delete('tb_users', ['user_id' => $id]);
 
         if ($delete) {
@@ -62,6 +78,8 @@ class User extends CI_Controller
 
     public function new()
     {
+        $this->_restrict_role_nonadmin();
+
         $rooms = $this->db->get('tb_rooms')->result();
 
         $data = [
@@ -76,6 +94,8 @@ class User extends CI_Controller
 
     public function add()
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
 
         $this->form_validation->set_rules('nik', 'NIK', 'is_unique[tb_profiles.nik]');
@@ -124,6 +144,8 @@ class User extends CI_Controller
 
     public function edit($nik)
     {
+        $this->_restrict_role_nonadmin();
+
         $profile = $this->db->get_where('tb_profiles', ['nik' => $nik])->row();
         
         if (!$profile) {
@@ -143,6 +165,8 @@ class User extends CI_Controller
 
     private function _reset_password($nik)
     {
+        $this->_restrict_role_nonadmin();
+
         $user_id = $this->db->select('user_id')
             ->from('tb_profiles')
             ->where('nik', $nik)
@@ -166,6 +190,8 @@ class User extends CI_Controller
 
     public function update($nik)
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
 
         if (isset($post['reset'])) {
@@ -200,20 +226,6 @@ class User extends CI_Controller
         } catch (\Throwable $th) {
             echo $th->getMessage();
         }
-    }
-
-
-    public function user_detail($code)
-    {
-        $boxes = $this->db->get_where('tb_boxes', ['user_code' => $code])->result();
-
-        $data = [
-            'view' => 'user/detail',#content
-            'title' => 'DETAIL RAK EXISTING #' . $code,
-            'boxes' => $boxes,
-        ];
-
-        $this->view($data);   
     }
 
 }

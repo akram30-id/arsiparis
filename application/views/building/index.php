@@ -45,92 +45,34 @@
                                 <td><?= date('d F Y', strtotime($building->created_at)) . ' by ' . $building->added_by ?></td>
                                 <td><?= $building->updated_at == null ? '<i>belum pernah update</i>' : date('d F Y', strtotime($building->updated_at)) . ' by ' . $building->updated_by ?></td>
                                 <td>
-                                    <!-- delete vendor trigger modal -->
-                                    <button type="button" class="btn btn-danger btn-sm rounded-pill mb-1 btn-modal" data-bs-toggle="modal" data-bs-target="#deleteGudang<?= $building->building_id ?>">
-                                        Hapus
-                                    </button>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <!-- delete building trigger modal -->
+                                            <button type="button" class="btn btn-danger btn-sm rounded-pill" data-bs-toggle="collapse" data-bs-target="#deletebuilding<?= $building->building_id ?>" aria-expanded="false" aria-controls="deletebuilding<?= $building->building_id ?>">
+                                                Hapus
+                                            </button>
+                                        </div>
+                                        <div class="col-md-8 my-1">
+                                            <!-- <div style="min-height: 120px;"> -->
+                                                <div class="collapse collapse-horizontal" id="deletebuilding<?= $building->building_id ?>">
+                                                    <div class="card card-body" style="width: 300px;">
+                                                    Yakin Ingin Menghapus Gedung/Gudang <?= $building->building_name ?>?
+                                                    <div class="d-flex justify-content-end">
+                                                        <a style="color: red; margin-right: 8px;" href="<?= base_url('building/delete/' . $building->building_id) ?>">Ya</a>
+                                                        <a style="color: red;" data-bs-toggle="collapse" data-bs-target="#deletebuilding<?= $building->building_id ?>" href="#">Tidak</a>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            <!-- </div> -->
+                                        </div>
+                                    </div>
 
-                                    <!-- update vendor trigger modal -->
-                                    <a href="<?= base_url("building/edit/$building->building_id#content") ?>" class="btn btn-warning btn-sm rounded-pill btn-modal">
+                                    <!-- update building trigger modal -->
+                                    <a href="<?= base_url("building/edit/$building->building_id#content") ?>" class="btn btn-warning btn-sm rounded-pill btn-modal mb-1">
                                         Update
                                     </a>
                                 </td>
                             </tr>
-
-
-                            <!-- DELETE vendor Modal -->
-                            <div class="modal fade" id="deleteGudang<?= $building->building_id ?>" aria-labelledby="deleteGudangLabel">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <div class="d-flex justify-content-between">
-                                                <h4 class="fw-bold">Hapus Gudang <?= $building->building_name ?>?</h4>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="d-flex justify-content-end mt-5">
-                                                <a href="#" data-bs-dismiss="modal" class="btn btn-secondary btn-sm" style="margin-right: 8px;">Tidak</a>
-                                                <a href="<?= base_url('building/delete/' . $building->building_id) ?>" class="btn btn-danger btn-sm">Hapus</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <!-- UPDATE vendor Modal -->
-                            <div class="modal fade" id="updateGudang<?= $building->building_id ?>" tabindex="-1" aria-labelledby="updateGudangLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <div class="d-flex justify-content-between">
-                                                <h4 class="fw-bold">Update Gedung</h4>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-
-                                            <form action="<?= base_url('building/update/' . $building->building_id) ?>" method="POST" class="needs-validation" novalidate>
-
-                                                <div class="row justify-content-center mt-3">
-                                                    <div class="col-md-12 mb-4">
-                                                        <label for="nama-vendor" class="form-label">NAMA GEDUNG</label>
-                                                        <input type="text" class="form-control" id="nama-gedung" name="nama-gedung" value="<?= $building->building_name ?>" required>
-                                                        <div class="invalid-feedback">
-                                                            Nama gudang Wajib Diisi
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12 mb-4">
-                                                        <label for="kode-vendor" class="form-label">KODE GEDUNG</label>
-                                                        <input type="text" class="form-control" id="kode-gedung" name="kode-gedung" value="<?= $building->building_code ?>" disabled>
-                                                    </div>
-                                                    <div class="col-md-12 mb-4">
-                                                        <label for="kode-vendor" class="form-label">DESKRIPSI</label>
-                                                        <input type="text" class="form-control" id="deskripsi-gedung" name="deskripsi-gedung" value="<?= $building->description ?>" required>
-                                                        <div class="invalid-feedback">
-                                                            Deskripsi Gedung Wajib Diisi
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12 mb-4">
-                                                        <label for="status-gedung" class="form-label">STATUS</label>
-                                                        <?php $status = ['ACTIVE', 'INACTIVE'] ?>
-                                                        <select class="form-select" name="status-gedung" id="status-gedung">
-                                                            <?php foreach ($status as $s) { ?>
-                                                            <option value="<?= $s ?>" <?php if ($s == $building->status) echo "selected='selected'" ?>><?= $s ?></option>
-                                                            <?php } ?>
-                                                        </select>
-                                                        <div class="invalid-feedback">
-                                                            Status gedung wajib dipilih.
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="d-flex justify-content-end mt-5">
-                                                    <a href="#" data-bs-dismiss="modal" class="btn btn-secondary btn-sm" style="margin-right: 8px;">Batal</a>
-                                                    <input type="submit" value="Update" class="btn btn-warning btn-sm">
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                             <?php } ?>
                         </tbody>
