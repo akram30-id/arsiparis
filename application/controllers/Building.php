@@ -28,6 +28,8 @@ class Building extends CI_Controller
 
     public function edit($id)
     {
+        $this->_restrict_role_nonadmin();
+
         $buildings = $this->db->get_where('tb_buildings', ['building_id' => $id])->row();
 
         $data = [
@@ -42,6 +44,8 @@ class Building extends CI_Controller
 
     public function update($id)
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
 
         try {
@@ -63,6 +67,8 @@ class Building extends CI_Controller
 
     public function delete($id)
     {
+        if($this->_restrict_role_nonadmin() == false) return false;
+
         try {
             $delete = $this->db->delete('tb_buildings', ['building_id' => $id]);
 
@@ -81,6 +87,8 @@ class Building extends CI_Controller
 
     public function new()
     {
+        $this->_restrict_role_nonadmin();
+
         $data = [
             'view' => 'building/new',
             'title' => 'Tambah Gedung Baru'
@@ -91,7 +99,15 @@ class Building extends CI_Controller
 
     public function add()
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
+
+        if (isset($post['kode-gedung'])) {
+            if (in_array($post['kode-gedung'], ['', null])) {
+                $post['kode-gedung'] = 'DBSBLD' . date('YmdHis');
+            }
+        }
 
         try {
             $this->db->insert('tb_buildings', [

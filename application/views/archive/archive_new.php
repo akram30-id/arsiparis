@@ -87,7 +87,7 @@
                                 <label for="jadwal-retensi" class="form-label">Jadwal Retensi</label>
                                 <select class="form-select" name="jadwal-retensi" id="jadwal-retensi" required>
                                 <?php
-                                $schedule = ['TAHUNAN', 'BULANAN', 'HARIAN']; 
+                                $schedule = ['ANNUALY', 'MONTHLY', 'DAILY']; 
                                 foreach ($schedule as $s) { ?>
                                     <option value="<?= $s ?>"><?= $s ?></option>
                                     <?php 
@@ -103,14 +103,6 @@
                                 <input type="date" class="form-control" id="tanggal-retensi" name="tanggal-retensi" required>
                                 <div class="invalid-feedback">
                                     Tanggal Retensi Wajib Diisi
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mb-4">
-                                <label for="pencipta" class="form-label">Pencipta Arsip</label>
-                                <input type="text" class="form-control" id="pencipta" name="pencipta" required>
-                                <div class="invalid-feedback">
-                                    Pencipta Arsip Wajib Diisi
                                 </div>
                             </div>
 
@@ -150,21 +142,6 @@
             }
             // console.info(selected)
         })
-
-
-        $('#pencipta').on('change', function () {
-            $.ajax({
-                url: "'" + <?= base_url('archive/show_profiles?name=') ?> + $(this).val() + "'",
-                type: 'GET',
-                dataType: 'JSON',
-                success: function(response) {
-                    console.info(response)
-                }
-            })
-        })
-
-
-
         
     })
 </script>

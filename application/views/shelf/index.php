@@ -1,7 +1,7 @@
 <section class="section" style="margin-bottom: 164px;">
 
     <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <?php if ($this->session->flashdata('success')) { ?>
             <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
                 <?= $this->session->flashdata('success'); ?>

@@ -49,6 +49,8 @@ class Unit extends CI_Controller
 
     public function delete($id)
     {
+        if ($this->_restrict_role_nonadmin() == false) return false;
+
         $delete = $this->db->delete('tb_units', ['unit_id' => $id]);
 
         if ($delete) {
@@ -63,6 +65,8 @@ class Unit extends CI_Controller
 
     public function new()
     {
+        $this->_restrict_role_nonadmin();
+
         $units = $this->db->get('tb_units')->result();
         $buildings = $this->db->get('tb_buildings')->result();
 
@@ -79,6 +83,8 @@ class Unit extends CI_Controller
 
     public function add()
     {
+        $this->_restrict_role_nonadmin();
+
         $post = $this->input->post();
 
         if (isset($post['kode-unit'])) {
@@ -114,6 +120,8 @@ class Unit extends CI_Controller
 
     public function edit($id)
     {
+        $this->_restrict_role_nonadmin();
+
         $unit = $this->db->get_where('tb_units', ['unit_id' => $id])->row();
 
         $data = [
@@ -128,6 +136,8 @@ class Unit extends CI_Controller
 
     public function update($unit_code)
     {
+        $this->_restrict_role_nonadmin();
+        
         $post = $this->input->post();
 
         try {

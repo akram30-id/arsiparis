@@ -28,7 +28,7 @@ class Auth extends CI_Controller
 
             $this->session->set_userdata('token', date('Ymd-H:i:s') . 'd!$P0Ra');
 
-            $userData = $this->db->select('tu.username, name, nik')
+            $userData = $this->db->select('tu.username, tp.name, tp.nik, tp.role')
                 ->from('tb_users AS tu')
                 ->join('tb_profiles AS tp', 'tp.user_id=tu.user_id')
                 ->where('tu.username', $username)

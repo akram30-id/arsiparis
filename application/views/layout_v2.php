@@ -28,9 +28,10 @@
     <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
 
     <!-- JQUERY JS CDN -->
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <!-- JQUERY AUTOCOMPLETE -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
     <!-- Template Main CSS File -->
     <link href="<?= base_url() ?>assets/css/style.css" rel="stylesheet">
@@ -56,6 +57,18 @@
         td {
             vertical-align: middle;
         }
+
+        input[type=checkbox] {
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(1); /* IE */
+        -moz-transform: scale(1); /* FF */
+        -webkit-transform: scale(1); /* Safari and Chrome */
+        -o-transform: scale(1); /* Opera */
+        transform: scale(1);
+        padding: 10px;
+        border: 1px solid #000;
+        }
+
     </style>
 
     <!-- =======================================================
@@ -200,6 +213,7 @@
     <script src="<?= base_url() ?>assets/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
     <script>
         $('.datatable').DataTable({
@@ -230,6 +244,12 @@
         /*$(".btn-modal").on("click", function() {
             $(".modal-backdrop").remove();
         }); */
+
+
+
+        $('#pencipta').autocomplete({
+            source: "<?= base_url('archive/show_profiles') ?>"
+        })
     </script>
 
 </body>

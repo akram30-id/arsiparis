@@ -115,4 +115,21 @@ class CI_Controller {
 		}
 	}
 
+	protected function _restrict_role_nonadmin()
+    {
+        if ($this->session->user->role != '1') {
+            echo '<script>alert("you are not allowed to access this feature"); window.history.go(-1);</script>';
+            return false;
+        }
+		return true;
+    }
+
+	protected function _restrict_role_nonleader()
+    {
+        if (!in_array($this->session->user->role, [1, 2])) {
+            echo '<script>alert("you are not allowed to access this feature"); window.history.go(-1);</script>';
+            return false;
+        }
+    }
+
 }
