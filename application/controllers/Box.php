@@ -42,6 +42,8 @@ class Box extends CI_Controller
 
     public function delete($id)
     {
+        if($this->_restrict_role_nonadmin() == false) return false;
+
         $delete = $this->db->delete('tb_boxes', ['box_id' => $id]);
 
         if ($delete) {
@@ -56,6 +58,8 @@ class Box extends CI_Controller
 
     public function new()
     {
+        $this->_restrict_role_nonleader();
+
         $rak = $this->db->get('tb_shelfs')->result();
 
         $data = [
@@ -70,6 +74,8 @@ class Box extends CI_Controller
 
     public function add()
     {
+        $this->_restrict_role_nonleader();
+
         $post = $this->input->post();
 
         if (isset($post['kode-box'])) {
@@ -107,6 +113,8 @@ class Box extends CI_Controller
 
     public function edit($id)
     {
+        $this->_restrict_role_nonleader();
+
         $box = $this->db->get_where('tb_boxes', ['box_id' => $id])->row();
         $rak = $this->db->get('tb_shelfs')->result();
 
@@ -123,6 +131,8 @@ class Box extends CI_Controller
 
     public function update($box_code)
     {
+        $this->_restrict_role_nonleader();
+
         $post = $this->input->post();
 
         try {
