@@ -25,6 +25,7 @@
                                 <th>No.</th>
                                 <th>Kode Gedung</th>
                                 <th>Nama Gedung</th>
+                                <th>Alamat Gedung</th>
                                 <th>Deskripsi</th>
                                 <th>Status</th>
                                 <th>Dibuat Pada</th>
@@ -40,6 +41,7 @@
                                 <td><?= $no++ ?></td>
                                 <td><?= $building->building_code ?></td>
                                 <td><?= $building->building_name ?></td>
+                                <td><?= $building->address ?></td>
                                 <td><?= $building->description ?></td>
                                 <td><?= $building->status ?></td>
                                 <td><?= date('d F Y', strtotime($building->created_at)) . ' by ' . $building->added_by ?></td>

@@ -56,6 +56,13 @@
                                 </div>
                             </div>
                             <div class="col-md-12 mb-4">
+                                <label for="kode-vendor" class="form-label">ALAMAT GEDUNG</label>
+                                <textarea name="alamat-gedung" id="alamat-gedung" rows="3" class="form-control" required><?= $buildings->address ?></textarea>
+                                <div class="invalid-feedback">
+                                    Alamat Gedung Wajib Diisi
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-4">
                                 <label for="kode-vendor" class="form-label">DESKRIPSI</label>
                                 <textarea name="deskripsi-gedung" id="deskripsi-gedung" rows="3" class="form-control" required><?= $buildings->description ?></textarea>
                                 <div class="invalid-feedback">
