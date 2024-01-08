@@ -1,4 +1,4 @@
-<section class="section" style="margin-bottom: 164px;">
+<section style="margin-bottom: 164px;">
 
     <div class="row justify-content-center mt-5" id="card-content">
         <div class="col-md-10" id="data">
@@ -23,7 +23,7 @@
                     <a href="<?= base_url('archive/archive_new#content') ?>" class="btn btn-primary btn-sm mb-3 rounded-pill">Tambah archive</a>
                     <a href="<?= base_url('archive/archive_show_disposed#content') ?>" class="btn btn-danger btn-sm mb-3 rounded-pill">Data Disposal</a>
                     <a href="<?= base_url('archive/archive_report#content') ?>" target="_blank" class="btn btn-success btn-sm mb-3 rounded-pill">Cetak Laporan Arsip</a>
-                    <table class="table table-hover table-responsive table-bordered datatable">
+                    <table class="table table-hover table-bordered datatable display">
                         <thead>
                             <tr>
                                 <th>No.</th>
