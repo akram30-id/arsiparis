@@ -52,6 +52,7 @@ class Building extends CI_Controller
             $this->db->update('tb_buildings', [
                 'building_name' => $post['nama-gedung'],
                 'description' => $post['deskripsi-gedung'],
+                'address' => $post['alamat-gedung'],
                 'status' => $post['status-gedung'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => $this->session->user->username
@@ -108,22 +109,26 @@ class Building extends CI_Controller
                 $post['kode-gedung'] = 'DBSBLD' . date('YmdHis');
             }
         }
+        
+        $this->db->trans_begin();
+        $this->db->insert('tb_buildings', [
+            'building_name' => $post['nama-gedung'],
+            'building_code' => $post['kode-gedung'],
+            'description' => $post['deskripsi-gedung'],
+            'address' => $post['alamat-gedung'],
+            'status' => $post['status-gedung'],
+            'created_at' => date('Y-m-d H:i:s'),
+            'added_by' => $this->session->user->username
+        ]);
 
-        try {
-            $this->db->insert('tb_buildings', [
-                'building_name' => $post['nama-gedung'],
-                'building_code' => $post['kode-gedung'],
-                'description' => $post['deskripsi-gedung'],
-                'status' => $post['status-gedung'],
-                'created_at' => date('Y-m-d H:i:s'),
-                'added_by' => $this->session->user->username
-            ]);
-
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('fail', "Gagal Tambah Data Gedung @serverError");
+        } else {
+            $this->db->trans_commit();
             $this->session->set_flashdata('success', "Berhasil Tambah Data Gedung");
-
-            return redirect('building/index#content#content');
-        } catch (\Throwable $th) {
-            echo $th->getMessage();
         }
+
+        return redirect('building/index#content#content');
     }
 }
