@@ -217,7 +217,10 @@
 
     <script>
         $('.datatable').DataTable({
-            responsive: true
+            responsive: true,
+            scrollX: true,
+            scrollY: false,
+            scrollCollapse: true,
         });
 
         // Example starter JavaScript for disabling form submissions if there are invalid fields
