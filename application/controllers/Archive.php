@@ -502,9 +502,9 @@ class Archive extends CI_Controller
             $this->db->trans_commit();
 
             // get shelf name
-            $box_name = $this->db->select('box_name')
+            $box_name = $this->db->select('*')
                 ->from('tb_boxes')
-                ->where('box_code', $post['box_code'])
+                ->where('box_code', $post['kode-box'])
                 ->get()->row();
 
             // get shelf name
