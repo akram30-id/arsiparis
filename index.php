@@ -1,6 +1,5 @@
 <?php
 
-// INIT FILE
 require_once "the_env.php";
 date_default_timezone_set('Asia/Jakarta');
 /**
