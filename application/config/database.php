@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'id21691048_dbsarchive',
-	'password' => '^4oyrL$965Mt',
-	'database' => 'id21691048_arsiparis',
+	'hostname' => getenv('DEFAULT_DBHOSTNAME'),
+	'username' => getenv('DEFAULT_DBUSERNAME'),
+	'password' => getenv('DEFAULT_DBPASSWORD'),
+	'database' => getenv('DEFAULT_DBNAME'),
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
